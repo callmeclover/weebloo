@@ -15,10 +15,10 @@ let floor, wallLeft, wallRight, ceiling;
 let bouncyFloor, slipperyFloor;
 
 let jumpPower;
-let agility = 2.5;
-let maxSpeed = 20;
-let jumps = 3,
-    maxJumps = 3;
+let agility = 2;
+let maxSpeed = 10;
+let jumps = 2,
+    maxJumps = 2;
 
 
 function setup() {
@@ -26,9 +26,11 @@ function setup() {
   frameRate(60);
 
   floors = new Group()
+
   sprite = new Sprite(width / 2, height / 2, 30, 30);
   sprite.rotationLock = true;
   sprite.bounciness = 0.15;
+  sprite.friction = 1.25;
 
   floor = new floors.Sprite(width * 0.5, height, width, 20, "s");
   ceiling = new Sprite(width * 0.5, 0, width, 20, "s");
@@ -60,7 +62,6 @@ function draw() {
   text("bouncy", bouncyFloor.pos.x, height * 0.75 - 10);
   text("slippery", slipperyFloor.pos.x, height * 0.75 - 10);
 
-  textSize(40)
   text("p5.js movement test", width*0.5, height * 0.25);
 
   if (sprite.collide(floors)) {
