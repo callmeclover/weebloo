@@ -1,93 +1,110 @@
 function contains(arr, value) {
   var i = arr.length;
   while (i--) {
-      if (arr[i] === value) return true;
+    if (arr[i] === value) return true;
   }
   return false;
 }
 
 let sprite;
 
-let floors;
-
-let floor, wallLeft, wallRight, ceiling;
-
-let bouncyFloor, slipperyFloor;
-
 let jumpPower;
 let agility = 2;
 let maxSpeed = 10;
 let jumps = 2,
-    maxJumps = 2;
-
+  maxJumps = 2;
 
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
   frameRate(60);
+  background(27);
 
-  floors = new Group()
-
-  sprite = new Sprite(width / 2, height / 2, 30, 30);
+  sprite = new Sprite(0, 250, 30, 30);
   sprite.rotationLock = true;
   sprite.bounciness = 0.15;
   sprite.friction = 1.25;
+  sprite.color = 'rgb(178, 23, 103)'
 
-  floor = new floors.Sprite(width * 0.5, height, width, 20, "s");
-  ceiling = new Sprite(width * 0.5, 0, width, 20, "s");
-  wallLeft = new Sprite(0, height * 0.5, 20, height, "s");
-  wallRight = new Sprite(width, height * 0.5, 20, height, "s");
+  textFont("Orbit");
 
-  bouncyFloor = new floors.Sprite(width * 0.25, height * 0.75, 100, 10, "s");
-  bouncyFloor.bounciness = 1;
-  slipperyFloor = new floors.Sprite(width * 0.75, height * 0.75, 100, 10, "s");
-  slipperyFloor.friction = 0;
+  createLevel();
 
   world.gravity.y = 10;
   jumpPower = world.gravity.y * 0.5;
-
-  textFont("Orbit")
+  camera.zoom = 0.8;
 }
 
 function draw() {
-  background(255);
-  fill("rgba(0,0,0,0.7)");
+  background(27);
+  fill("rgba(255,255,255,0.7)");
   textSize(16);
   textAlign(LEFT);
   text(`fps: ${int(getFrameRate())}`, 15, 25);
   text(`xvel: ${Math.round(float(sprite.vel.x) * 10) / 10}`, 15, 41);
   text(`yvel: ${Math.round(float(sprite.vel.y) * 10) / 10}`, 15, 56);
+  text(`jumps: ${jumps}`, 15, 77);
 
-  fill(0);
-  textAlign(CENTER);
-  text("bouncy", bouncyFloor.pos.x, height * 0.75 - 10);
-  text("slippery", slipperyFloor.pos.x, height * 0.75 - 10);
+  camera.on();
 
-  text("p5.js movement test", width*0.5, height * 0.25);
+  textAlign(CENTER)
+  fill(255)
+  textSize(24)
+  text("Welcome to Insurrection!", 0, 200)
+  textSize(16)
+  text("Use ⮜ and ⮞ to move.", 0, 232)
+  textSize(16)
+  text("Use ⮝ to jump.", 550, 402)
+  textSize(12)
+  text("(you can double jump, too.)", 550, 418)
 
-  if (sprite.collide(floors)) {
+  camera.off();
+
+  if (sprite.collide(window.floors)) {
     jumps = maxJumps;
   }
 
-  if (contains(keysHeld, "ArrowRight") && !(contains(keysHeld, "ArrowLeft"))) {
-      sprite.vel.x = sprite.vel.x + agility;
-      if (sprite.vel.x > maxSpeed) {
-        sprite.vel.x = maxSpeed
-      }
-    } else if (contains(keysHeld, "ArrowLeft") && !(contains(keysHeld, "ArrowRight"))) {
-      sprite.vel.x = sprite.vel.x - agility;
-      if (sprite.vel.x < -maxSpeed) {
-        sprite.vel.x = -maxSpeed
-      }
+  if (theKey == "z" && sprite.collide(window.walls)) {
+    jumps = maxJumps;
+    theKey = ''
+  }
+
+  if (
+    contains(keysHeld, "ArrowRight") ||
+    (contains(keysHeld, "d") &&
+      !contains(keysHeld, "ArrowLeft") &&
+      !contains(keysHeld, "a"))
+  ) {
+    sprite.vel.x = sprite.vel.x + agility;
+    if (sprite.vel.x > maxSpeed) {
+      sprite.vel.x = maxSpeed;
     }
+  } else if (
+    contains(keysHeld, "ArrowLeft") ||
+    (contains(keysHeld, "a") &&
+      !contains(keysHeld, "ArrowRight") &&
+      !contains(keysHeld, "d"))
+  ) {
+    sprite.vel.x = sprite.vel.x - agility;
+    if (sprite.vel.x < -maxSpeed) {
+      sprite.vel.x = -maxSpeed;
+    }
+  }
+
+  camera.x = sprite.x;
+  camera.y = sprite.y;
 }
 
 function keyPressed() {
-  if (keyCode === DOWN_ARROW) {
+  if (theKey === "ArrowDown" || theKey === "s") {
     sprite.vel.y = sprite.vel.y + jumpPower;
-  } else if (keyCode === UP_ARROW) {
+  } else if (theKey === "ArrowUp" || theKey === "w") {
     if (jumps > 0) {
       sprite.vel.y = sprite.vel.y - jumpPower;
       jumps = jumps - 1;
     }
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
